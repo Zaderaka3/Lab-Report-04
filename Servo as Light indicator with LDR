@@ -1,0 +1,29 @@
+/*
+  Goal: Use an LDR to control the angle of a servo motor. 
+  The more light the LDR detects, the higher the angle of the servo, 
+  simulating a light indicator.
+*/
+#include <Servo.h> // Include the servo library
+Servo myservo; // Create a Servo object to control the motor
+int ldrValue; // Variable to store the analog reading from the LDR
+int angle; // Variable to store the mapped servo angle
+
+void setup() {
+  Serial.begin(9600); // Initialize serial communication for debugging
+  myservo.attach(9); // Attach the servo to digital pin 9
+}
+
+void loop() {
+  // Read the analog input from the LDR (0-1023)
+  ldrValue = analogRead(A0);
+  // Map the LDR value (0-1023) to a servo angle (0-180 degrees)
+  angle = map(ldrValue, 0, 1023, 0, 180);
+  // Print the readings to the Serial Monitor
+  Serial.print("LDR Value = ");
+  Serial.print(ldrValue);  // Raw analog value from LDR
+  Serial.print("\t Angle = ");
+  Serial.println(angle); // Mapped servo angle
+  // Move the servo to the mapped angle
+  myservo.write(angle);
+  delay(15); // Small delay to stabilize the servo position
+}
