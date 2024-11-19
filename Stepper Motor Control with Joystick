@@ -1,1 +1,52 @@
+/*
+ * Goal:
+ * This code allows a stepper motor to be controlled using a joystick. 
+ * The joystick's vertical axis (Y-axis) controls the speed of the motor, 
+ * while the horizontal axis (X-axis) controls the direction.
+ */
+#include <Stepper.h>
+// Define stepper motor steps per revolution (adjust based on your motor)
+const int stepsPerRevolution = 200;
+// Initialize stepper motor on pins 8-11
+Stepper myStepper(stepsPerRevolution, 8, 9, 10, 11);
+// Joystick pins
+const int joyX = A0; // Horizontal axis
+const int joyY = A1; // Vertical axis
+int speedValue = 0;  // Speed value for the stepper
+int direction = 0;   // Direction of the stepper
 
+void setup() {
+  Serial.begin(9600); // Start serial communication for debugging
+  myStepper.setSpeed(1); // Initialize stepper speed to a small value
+}
+
+void loop() {
+  // Read joystick position
+  int xValue = analogRead(joyX); // Horizontal axis
+  int yValue = analogRead(joyY); // Vertical axis
+  // Map joystick's vertical position to speed (-100 to 100)
+  speedValue = map(yValue, 0, 1023, -100, 100);
+  // Determine direction based on horizontal joystick position
+  if (xValue < 400) {
+    direction = -1; // Counterclockwise
+  } else if (xValue > 600) {
+    direction = 1;  // Clockwise
+  } else {
+    direction = 0;  // Stop
+  }
+  // Set stepper speed and move in the selected direction
+  if (direction != 0 && speedValue != 0) {
+    myStepper.setSpeed(abs(speedValue)); // Set speed (positive value)
+    myStepper.step(direction * (abs(speedValue) * stepsPerRevolution) / 1000); // Adjust steps
+  }
+  // Print joystick readings for debugging
+  Serial.print("X: ");
+  Serial.print(xValue);
+  Serial.print("\t Y: ");
+  Serial.print(yValue);
+  Serial.print("\t Speed: ");
+  Serial.print(speedValue);
+  Serial.print("\t Direction: ");
+  Serial.println(direction);
+  delay(25); // Small delay for smoother operation
+}
